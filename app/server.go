@@ -14,6 +14,7 @@ func main() {
 	}
 
 	c, err := l.Accept()
+	defer l.Close()
 	if err != nil {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
@@ -26,4 +27,5 @@ func main() {
 		os.Exit(1)
 	}
 	WriteResponse(c, StatusCodeOK, StatusDescriptionOK)
+	c.Close()
 }
