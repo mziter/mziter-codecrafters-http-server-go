@@ -13,9 +13,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	_, err = l.Accept()
+	c, err := l.Accept()
 	if err != nil {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
+
+	var input []byte
+	_, err = c.Read(input)
+	if err != nil {
+		fmt.Println("Error reading connection: ", err.Error())
+		os.Exit(1)
+	}
+	WriteResponse(c, StatusCodeOK, StatusDescriptionOK)
 }
