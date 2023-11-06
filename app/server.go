@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/codecrafters-io/http-server-starter-go/app/http"
@@ -51,6 +52,9 @@ func handleConn(c net.Conn) {
 		echo(c, echoString)
 	} else if strings.HasPrefix(req.Path, "/user-agent") {
 		userAgent(c, req.Headers)
+	} else if strings.HasPrefix(req.Path, "/files/") {
+		filename := strings.TrimPrefix(req.Path, "/files/")
+		sendFile(c, filename)
 	} else {
 		http.WriteResponse(c, http.StatusCodeNotFound, http.StatusDescriptionNotFound, nil, nil)
 	}
@@ -74,4 +78,19 @@ func userAgent(c net.Conn, headers map[string]string) {
 		"Content-Length": fmt.Sprint(len(userAgent)),
 	}
 	http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK, respHeaders, []byte(userAgent))
+}
+
+func sendFile(c net.Conn, fileName string) {
+	dir := os.Args[2]
+	fmt.Printf("received args: %v", dir)
+	contents, err := os.ReadFile(path.Join(dir, fileName))
+	if err != nil {
+		fmt.Printf("file read error: %s", err.Error())
+		http.WriteResponse(c, http.StatusCodeInternalServiceError, http.StatusDescriptionInternalServiceError, nil, nil)
+	}
+	respHeaders := map[string]string{
+		"Content-Type":   "application/octet-stream",
+		"Content-Length": fmt.Sprint(len(contents)),
+	}
+	http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK, respHeaders, contents)
 }
