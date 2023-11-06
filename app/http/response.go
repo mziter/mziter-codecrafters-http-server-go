@@ -1,4 +1,4 @@
-package main
+package http
 
 import (
 	"fmt"
@@ -7,8 +7,10 @@ import (
 )
 
 const (
-	StatusCodeOK        = 200
-	StatusDescriptionOK = "OK"
+	StatusCodeOK              = 200
+	StatusCodeNotFound        = 404
+	StatusDescriptionOK       = "OK"
+	StatusDescriptionNotFound = "Not Found"
 )
 
 func WriteResponse(w io.Writer, statusCode int, statusDescription string) {

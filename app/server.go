@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+
+	"github.com/codecrafters-io/http-server-starter-go/app/http"
 )
 
 func main() {
@@ -14,18 +16,31 @@ func main() {
 	}
 
 	c, err := l.Accept()
-	defer l.Close()
 	if err != nil {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
+	defer l.Close()
+	defer c.Close()
 
-	var input []byte
+	input := make([]byte, 1024)
 	_, err = c.Read(input)
 	if err != nil {
 		fmt.Println("Error reading connection: ", err.Error())
 		os.Exit(1)
 	}
-	WriteResponse(c, StatusCodeOK, StatusDescriptionOK)
+
+	req, err := http.ParseRequest(input)
+	if err != nil {
+		fmt.Println("Error parsing request: ", err.Error())
+		os.Exit(1)
+	}
+
+	fmt.Printf("REQ: %v\n", req)
+	if req.Path == "/" {
+		http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK)
+	} else {
+		http.WriteResponse(c, http.StatusCodeNotFound, http.StatusDescriptionNotFound)
+	}
 	c.Close()
 }
