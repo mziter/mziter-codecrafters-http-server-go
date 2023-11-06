@@ -43,6 +43,8 @@ func main() {
 	} else if strings.HasPrefix(req.Path, "/echo/") {
 		echoString := strings.TrimPrefix(req.Path, "/echo/")
 		echo(c, echoString)
+	} else if strings.HasPrefix(req.Path, "/user-agent") {
+		userAgent(c, req.Headers)
 	} else {
 		http.WriteResponse(c, http.StatusCodeNotFound, http.StatusDescriptionNotFound, nil, nil)
 	}
@@ -55,4 +57,16 @@ func echo(c net.Conn, echoString string) {
 		"Content-Length": fmt.Sprint(len(echoString)),
 	}
 	http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK, headers, []byte(echoString))
+}
+
+func userAgent(c net.Conn, headers map[string]string) {
+	userAgent, found := headers["User-Agent"]
+	if !found {
+		http.WriteResponse(c, http.StatusCodeBadRequest, http.StatusDescriptionBadRequest, nil, nil)
+	}
+	respHeaders := map[string]string{
+		"Content-Type":   "text/plain",
+		"Content-Length": fmt.Sprint(len(userAgent)),
+	}
+	http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK, respHeaders, []byte(userAgent))
 }

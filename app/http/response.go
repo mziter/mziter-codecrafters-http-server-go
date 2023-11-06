@@ -8,9 +8,11 @@ import (
 
 const (
 	StatusCodeOK                          = 200
+	StatusCodeBadRequest                  = 400
 	StatusCodeNotFound                    = 404
 	StatusCodeInternalServiceError        = 500
 	StatusDescriptionOK                   = "OK"
+	StatusDescriptionBadRequest           = "Bad Request"
 	StatusDescriptionNotFound             = "Not Found"
 	StatusDescriptionInternalServiceError = "Internal Service Error"
 )
