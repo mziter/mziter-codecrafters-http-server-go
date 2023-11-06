@@ -33,13 +33,13 @@ func handleConn(c net.Conn) {
 	defer c.Close()
 
 	input := make([]byte, 1024)
-	_, err := c.Read(input)
+	bytesRead, err := c.Read(input)
 	if err != nil {
 		fmt.Println("Error reading connection: ", err.Error())
 		os.Exit(1)
 	}
 
-	req, err := http.ParseRequest(input)
+	req, err := http.ParseRequest(input[0 : bytesRead+1])
 	if err != nil {
 		fmt.Println("Error parsing request: ", err.Error())
 		os.Exit(1)
