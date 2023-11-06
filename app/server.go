@@ -15,17 +15,23 @@ func main() {
 		fmt.Println("Failed to bind to port 4221")
 		os.Exit(1)
 	}
-
-	c, err := l.Accept()
-	if err != nil {
-		fmt.Println("Error accepting connection: ", err.Error())
-		os.Exit(1)
-	}
 	defer l.Close()
+
+	for {
+		c, err := l.Accept()
+		if err != nil {
+			fmt.Println("Error accepting connection: ", err.Error())
+		}
+		go handleConn(c)
+	}
+
+}
+
+func handleConn(c net.Conn) {
 	defer c.Close()
 
 	input := make([]byte, 1024)
-	_, err = c.Read(input)
+	_, err := c.Read(input)
 	if err != nil {
 		fmt.Println("Error reading connection: ", err.Error())
 		os.Exit(1)
@@ -48,7 +54,6 @@ func main() {
 	} else {
 		http.WriteResponse(c, http.StatusCodeNotFound, http.StatusDescriptionNotFound, nil, nil)
 	}
-	c.Close()
 }
 
 func echo(c net.Conn, echoString string) {
