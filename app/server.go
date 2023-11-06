@@ -39,7 +39,7 @@ func handleConn(c net.Conn) {
 		os.Exit(1)
 	}
 
-	req, err := http.ParseRequest(input[0 : bytesRead+1])
+	req, err := http.ParseRequest(input[0:bytesRead])
 	if err != nil {
 		fmt.Println("Error parsing request: ", err.Error())
 		os.Exit(1)
