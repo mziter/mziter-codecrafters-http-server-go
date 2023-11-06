@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -85,6 +86,9 @@ func sendFile(c net.Conn, fileName string) {
 	fmt.Printf("received args: %v", dir)
 	contents, err := os.ReadFile(path.Join(dir, fileName))
 	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			http.WriteResponse(c, http.StatusCodeNotFound, http.StatusDescriptionNotFound, nil, nil)
+		}
 		fmt.Printf("file read error: %s", err.Error())
 		http.WriteResponse(c, http.StatusCodeInternalServiceError, http.StatusDescriptionInternalServiceError, nil, nil)
 	}
