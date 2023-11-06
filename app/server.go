@@ -43,6 +43,8 @@ func main() {
 	} else if strings.HasPrefix(req.Path, "/echo/") {
 		echoString := strings.TrimPrefix(req.Path, "/echo/")
 		echo(c, echoString)
+	} else {
+		http.WriteResponse(c, http.StatusCodeNotFound, http.StatusDescriptionNotFound, nil, nil)
 	}
 	c.Close()
 }
