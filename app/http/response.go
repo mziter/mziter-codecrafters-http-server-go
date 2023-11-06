@@ -7,11 +7,14 @@ import (
 )
 
 const (
-	StatusCodeOK                          = 200
-	StatusCodeBadRequest                  = 400
-	StatusCodeNotFound                    = 404
-	StatusCodeInternalServiceError        = 500
+	StatusCodeOK                   = 200
+	StatusCodeCreated              = 201
+	StatusCodeBadRequest           = 400
+	StatusCodeNotFound             = 404
+	StatusCodeInternalServiceError = 500
+
 	StatusDescriptionOK                   = "OK"
+	StatusDescriptionCreated              = "Created"
 	StatusDescriptionBadRequest           = "Bad Request"
 	StatusDescriptionNotFound             = "Not Found"
 	StatusDescriptionInternalServiceError = "Internal Service Error"

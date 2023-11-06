@@ -50,5 +50,16 @@ func ParseRequest(request []byte) (Request, error) {
 		req.Headers[string(tokens[0])] = string(tokens[1])
 	}
 
+	// rest is body
+	var body []byte
+	for s.Scan() {
+		line := s.Bytes()
+		if bytes.Equal(line, []byte("")) {
+			break
+		}
+		body = append(body, line...)
+	}
+	req.Body = body
+
 	return req, nil
 }

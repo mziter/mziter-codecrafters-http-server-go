@@ -53,9 +53,12 @@ func handleConn(c net.Conn) {
 		echo(c, echoString)
 	} else if strings.HasPrefix(req.Path, "/user-agent") {
 		userAgent(c, req.Headers)
-	} else if strings.HasPrefix(req.Path, "/files/") {
+	} else if req.Method == "GET" && strings.HasPrefix(req.Path, "/files/") {
 		filename := strings.TrimPrefix(req.Path, "/files/")
 		sendFile(c, filename)
+	} else if req.Method == "POST" && strings.HasPrefix(req.Path, "/files/") {
+		filename := strings.TrimPrefix(req.Path, "/files/")
+		receiveFile(c, filename, req.Body)
 	} else {
 		http.WriteResponse(c, http.StatusCodeNotFound, http.StatusDescriptionNotFound, nil, nil)
 	}
@@ -83,7 +86,6 @@ func userAgent(c net.Conn, headers map[string]string) {
 
 func sendFile(c net.Conn, fileName string) {
 	dir := os.Args[2]
-	fmt.Printf("received args: %v", dir)
 	contents, err := os.ReadFile(path.Join(dir, fileName))
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -97,4 +99,14 @@ func sendFile(c net.Conn, fileName string) {
 		"Content-Length": fmt.Sprint(len(contents)),
 	}
 	http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK, respHeaders, contents)
+}
+
+func receiveFile(c net.Conn, fileName string, contents []byte) {
+	dir := os.Args[2]
+	err := os.WriteFile(path.Join(dir, fileName), contents, 0555)
+	if err != nil {
+		fmt.Printf("file write error: %s", err.Error())
+		http.WriteResponse(c, http.StatusCodeInternalServiceError, http.StatusDescriptionInternalServiceError, nil, nil)
+	}
+	http.WriteResponse(c, http.StatusCodeCreated, http.StatusDescriptionCreated, nil, nil)
 }
