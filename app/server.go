@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
 
 	"github.com/codecrafters-io/http-server-starter-go/app/http"
 )
@@ -38,9 +39,18 @@ func main() {
 
 	fmt.Printf("REQ: %v\n", req)
 	if req.Path == "/" {
-		http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK)
-	} else {
-		http.WriteResponse(c, http.StatusCodeNotFound, http.StatusDescriptionNotFound)
+		http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK, nil, nil)
+	} else if strings.HasPrefix(req.Path, "/echo/") {
+		echoString := strings.TrimPrefix(req.Path, "/echo/")
+		echo(c, echoString)
 	}
 	c.Close()
+}
+
+func echo(c net.Conn, echoString string) {
+	headers := map[string]string{
+		"Content-Type":   "text/plain",
+		"Content-Length": fmt.Sprint(len(echoString)),
+	}
+	http.WriteResponse(c, http.StatusCodeOK, http.StatusDescriptionOK, headers, []byte(echoString))
 }
